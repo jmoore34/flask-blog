@@ -1,0 +1,21 @@
+<html>
+    {% if username == None %}
+        <h3 style="color:red">You must be logged in to view this page.</h3>
+        <a href="/login">Log in</a>
+    {% else %}
+        <h1>Contact us!</h1>
+        <p>Use the following to contact us:
+        <ul>
+        {% for phone_number in phone_numbers %}
+            <li>{{phone_number}}</li>
+        {% endfor %}
+        </ul>
+        <p>Go to /contactus/[an integer] to change the number of phone numbers displayed
+        <hr>
+        <p>Send us a message!</p>
+        <form action="/contactus" method="POST">
+            <textarea name="text"></textarea><br>
+            <input type="submit" value="submit" />
+        </form>
+    {% endif %}
+</html>
