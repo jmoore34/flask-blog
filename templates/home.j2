@@ -9,6 +9,10 @@
 <br>
 {% endif %}
 
+{% if session["user"] %}
+<p><a href="/edit">Create new post</a></p>
+{% endif %}
+
 {% for post in posts %}
     <div style="padding: 1em; border: 1px solid black; margin: 1em;">
         <p><b>{{ post.username }}</b></p>
