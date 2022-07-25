@@ -1,2 +1,15 @@
-<p>Flask Blog</p>
+<p style="clear:both; display: block;">
+    <span style="float: left;">Flask Blog - <a href="/home">Home</a></span>
+
+    <span style="float: right;">
+        {% if session["user"] %}
+            Logged in as {{ session["user"]["username"] }}. <a href="/logout">Log out</a>
+        {% else %}
+            <a href="/login">Log in</a> - <a href="/register">Register</a>
+        {% endif %}
+    </span>
+</p>
+<br><br><br>
+<div style="display:block;">
 {% block content %}{% endblock %}
+</div>

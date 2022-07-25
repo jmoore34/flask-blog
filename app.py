@@ -12,6 +12,7 @@ app.secret_key = "1ccbfc0a11ac4264b771d230fb952b95"
 
 
 @app.route("/")
+@app.route("/home/")
 @app.route("/home/<message>")
 def home(message = None) -> Response:
     """Renders the main homepage with an optional message to the user
