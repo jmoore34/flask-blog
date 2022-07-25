@@ -3,73 +3,12 @@ A small flask application.
 Run `flask run` in the directory to start.
 """
 
+from mylib import db_functions,my_forms
+from flask import Flask, redirect, render_template, session, request
 
-from my_forms import RegisterForm
-from random import randint
-import sqlite3
-import sys
-from flask import Flask, redirect, render_template, session, request, make_response
 
 app = Flask(__name__)
 app.secret_key = "1ccbfc0a11ac4264b771d230fb952b95"
-
-
-def get_db_connection():
-    """Connects to the database
-
-    Returns:
-        Connection: the connection to the database
-    """
-    connection = None
-    try:
-        connection = sqlite3.connect("database.db")
-
-        # Make it so results are dicts, not tuples
-        connection.row_factory = sqlite3.Row
-
-        return connection
-    except sqlite3.Error as exception:
-        print(f"Error while getting db connection: {exception}")
-        if connection is not None:
-            connection.close()
-        return None
-
-
-def get_messages():
-    """Fetches all the messages from the database
-
-    Returns:
-        List: a list of dictionaries with `username` and `content` keys
-    """
-    try:
-        with (connection := get_db_connection()):
-            return connection.execute("SELECT * FROM messages ORDER BY created DESC")
-
-    except sqlite3.Error as exception:
-        print(f"Error while getting all messages: {exception}")
-        sys.exit()
-
-
-def add_message(username, content):
-    """Inserts a message into the database
-
-    Args:
-        username (str): the poster's username
-        content (str): the message's text content
-    """
-    try:
-        with (connection := get_db_connection()):
-            connection.execute(
-                "INSERT INTO messages (username, content) VALUES (?,?)",
-                (username, content),
-            )
-            connection.commit()
-
-    except sqlite3.Error as exception:
-        print(
-            f"Error while adding message with username {username!r} "
-            f"and content {content!r}: {exception}"
-        )
 
 
 @app.route("/")
@@ -82,31 +21,35 @@ def root():
     return redirect("/main")
 
 
-@app.route("/main/")
-def homepage():
-    """The main page
+# @app.route("/main/")
+# def homepage():
+#     """The main page
 
-    Returns:
-        Response: content of the main page
-    """
-    visit_count = int(request.cookies.get("visit_count") or 0)
-    visit_count = visit_count + 1
-    response = make_response(
-        render_template(
-            "main.j2",
-            username=session.get("username"),
-            messages=get_messages(),
-            visit_count=visit_count,
-        )
-    )
-    response.set_cookie("visit_count", bytes(str(visit_count), "utf-8"))
-    return response
+#     Returns:
+#         Response: content of the main page
+#     """
+#     visit_count = int(request.cookies.get("visit_count") or 0)
+#     visit_count = visit_count + 1
+#     response = make_response(
+#         render_template(
+#             "main.j2",
+#             username=session.get("username"),
+#             messages=get_messages(),
+#             visit_count=visit_count,
+#         )
+#     )
+#     response.set_cookie("visit_count", bytes(str(visit_count), "utf-8"))
+#     return response
 
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-    form = RegisterForm()
+    form = my_forms.RegisterForm()
     if form.validate_on_submit():
+        db_functions.create_user(username=request.form["username"],
+            email=request.form["email"],
+            password=request.form["password"]
+        )
         session["username"] = request.form["username"]
         return redirect("/")
 
@@ -172,7 +115,7 @@ def contact(num_contacts=1):
         and len(request.form["text"]) > 0
     ):
 
-        add_message(session["username"], request.form["text"])
+        # add_message(session["username"], request.form["text"])
         return redirect("/main")
 
     phone_numbers = [
