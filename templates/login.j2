@@ -1,10 +1,17 @@
-<html>
-    <h1>Log in</h1>
-    <form action="/login" method="POST">
-        <label for="username">Username</label><br>
-        <input type="text" name="username" id="username" /><br>
-        <label for="password">Password</label><br>
-        <input type="password" name="password" id="password" /><br>
-        <input type="submit" value="Submit"/>
-    </form>
-</html>
+{% from "_formfield.j2" import render_field %}
+{% extends "base.j2" %}
+{% block content %}
+<form method="POST">
+    <fieldset>
+        <legend>Log in</legend>
+        {{ form.hidden_tag() }}
+
+        <dl>
+        {{ render_field(form.username_or_email) }}
+        {{ render_field(form.password) }}
+        </dl>
+
+        <input type="submit" value="Submit" />
+    </fieldset>
+</form>
+{% endblock %}

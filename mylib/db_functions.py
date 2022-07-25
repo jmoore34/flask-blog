@@ -2,9 +2,9 @@
 Functions for interacting with data in the database
 """
 
+from ast import Pass
 import sqlite3
 import sys
-from xmlrpc.client import Boolean
 import bcrypt
 from enum import Enum
 
@@ -198,17 +198,24 @@ def get_all_users():
     )
 
 
-def check_password(username, password):
-    """Checks to see if a username and password combination is correct
+def check_password(username_or_email: str, password: str):
+    """Checks to see if a username/email and password combination is correct
 
     Args:
-        username (str): The user's username
+        username_or_email (str): The user's username or email
         password (str): The user's provided password
 
     Returns:
         bool: whether the username exists and the password is correct
     """
-    user = get_user_by_username(username)
+    if not isinstance(username_or_email, str) or not isinstance(password, str):
+        return False
+    user = get_user_by_username_or_email(username_or_email)
     if user is None:
         return False
-    return bcrypt.checkpw(bytes(password,"utf-8"), user["password_hash"])
+    password_hash = user["password_hash"]
+    if not password_hash:
+        return None
+    if not isinstance(password_hash, bytes): # something went very wrong
+        raise Exception(f"Hash {password_hash} is {type(password_hash)} but should be of type bytes")
+    return bcrypt.checkpw(bytes(password,"utf8"), password_hash)
