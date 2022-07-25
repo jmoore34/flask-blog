@@ -3,8 +3,8 @@ A small flask application.
 Run `flask run` in the directory to start.
 """
 
-from mylib import db_functions, my_forms
 from flask import Flask, redirect, render_template, session, request, url_for, Response
+from mylib import db_functions, my_forms
 
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ app.secret_key = "1ccbfc0a11ac4264b771d230fb952b95"
 @app.route("/")
 @app.route("/home/")
 @app.route("/home/<message>")
-def home(message = None) -> Response:
+def home(message=None) -> Response:
     """Renders the main homepage with an optional message to the user
 
     Args:
@@ -23,7 +23,9 @@ def home(message = None) -> Response:
     Returns:
         Response: the rendered homepage HTML
     """
-    return render_template("home.j2", message=message, posts=db_functions.get_all_posts())
+    return render_template(
+        "home.j2", message=message, posts=db_functions.get_all_posts()
+    )
 
 
 @app.route("/about")
@@ -35,9 +37,18 @@ def about() -> Response:
     """
     return render_template("about.j2")
 
-@app.route("/edit", methods=["GET","POST"])
-@app.route("/edit/<int:post_id>", methods=["GET","POST"])
-def edit(post_id = None):
+
+@app.route("/edit", methods=["GET", "POST"])
+@app.route("/edit/<int:post_id>", methods=["GET", "POST"])
+def edit(post_id=None):
+    """Shows the edit page (for an existing or new post), or the POST endpoint to edit a post
+
+    Args:
+        post_id (int, optional): the post's id. Defaults to None.
+
+    Returns:
+        Response: edit page HTML or redirect
+    """
     if not session.get("user") or not session["user"]["id"]:
         return redirect(url_for("home"))
 
@@ -50,25 +61,25 @@ def edit(post_id = None):
 
     form = my_forms.EditForm()
     if form.validate_on_submit():
-        if existing is None: # brand new post
+        if existing is None:  # brand new post
             db_functions.create_post(
-                title = form.title.data,
-                content = form.content.data,
-                creator = session["user"]["id"]
+                title=form.title.data,
+                content=form.content.data,
+                creator=session["user"]["id"],
             )
             return redirect(url_for("home"))
-        else: # update existing
-            db_functions.update_post(
-                post_id = post_id,
-                title = form.title.data,
-                content = form.content.data
-            )
-            return redirect(url_for("home"))
+
+        # update existing
+        db_functions.update_post(
+            post_id=post_id, title=form.title.data, content=form.content.data
+        )
+        return redirect(url_for("home"))
 
     if existing is not None:
         form.title.data = existing["title"]
         form.content.data = existing["content"]
     return render_template("edit.j2", form=form)
+
 
 @app.route("/admin")
 def admin():
@@ -86,6 +97,11 @@ def admin():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """The register page, as well as POST endpoint to register a user
+
+    Returns:
+        Response: the register page HTML or redirect
+    """
     form = my_forms.RegisterForm()
     if form.validate_on_submit():
         db_functions.create_user(
@@ -113,9 +129,9 @@ def login():
     """
     form = my_forms.LoginForm()
     if form.validate_on_submit():  # checks that the password is correct
-        session["user"] = dict(db_functions.get_user_by_username_or_email(
-            form.username_or_email.data
-        )) # convert the row to a User dict
+        session["user"] = dict(
+            db_functions.get_user_by_username_or_email(form.username_or_email.data)
+        )  # convert the row to a User dict
 
         if session["user"]["is_admin"]:
             return redirect(url_for("admin"))
@@ -139,7 +155,6 @@ def logout():
     """
     session.pop("user")
     return redirect(url_for("home", message="Logged out successfully."))
-
 
 
 app.run()

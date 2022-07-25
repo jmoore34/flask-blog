@@ -23,15 +23,18 @@ def validate_username_or_email(_form, field):
 
 
 class RegisterForm(FlaskForm):
-    """A form for creating an account
-    """
-    username = StringField("Username", [Length(min=3, max=25), InputRequired(), validate_username_or_email])
+    """A form for creating an account"""
+
+    username = StringField(
+        "Username", [Length(min=3, max=25), InputRequired(), validate_username_or_email]
+    )
     email = EmailField("Email", [Email(), InputRequired(), validate_username_or_email])
     password = PasswordField("Password", [Length(min=3, max=50), InputRequired()])
     confirm_password = PasswordField(
         "Confirm password",
         [EqualTo("password", message="Passwords must match"), InputRequired()],
     )
+
 
 def validate_password(form, _field):
     """Checks to see if the username-password combination exists and is correct
@@ -47,15 +50,20 @@ def validate_password(form, _field):
     if not db_functions.check_password(username, password):
         raise ValidationError("Incorrect username/email or password")
 
+
 class LoginForm(FlaskForm):
-    """A form for logging in to an account
-    """
-    username_or_email = StringField("Username or email", [Length(min=3, max=25), InputRequired()])
-    password = PasswordField("Password", [Length(min=3, max=50), InputRequired(), validate_password])
+    """A form for logging in to an account"""
+
+    username_or_email = StringField(
+        "Username or email", [Length(min=3, max=25), InputRequired()]
+    )
+    password = PasswordField(
+        "Password", [Length(min=3, max=50), InputRequired(), validate_password]
+    )
 
 
 class EditForm(FlaskForm):
     """A form for editing a post"""
+
     title = StringField("Title", [InputRequired()])
     content = StringField("Content", [InputRequired()], widget=TextArea())
-    

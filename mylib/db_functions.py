@@ -2,11 +2,10 @@
 Functions for interacting with data in the database
 """
 
-from ast import Pass
 import sqlite3
 import sys
-import bcrypt
 from enum import Enum
+import bcrypt
 
 DATABASE_PATH = "mylib/database.sqlite"
 
@@ -32,14 +31,28 @@ def get_db_connection():
         return None
 
 
-
 class FetchAmount(Enum):
+    """An enum for how many rows execute_query should return"""
+
     ZERO = 0
     ONE = 1
     ALL = 2
 
 
-def execute_query(query, args_tuple, fetch_amount, error_msg):
+def execute_query(
+    query: str, args_tuple: tuple, fetch_amount: FetchAmount, error_msg: str
+):
+    """Executes a SQL query and prints an error if it fails
+
+    Args:
+        query (str): the SQL query
+        args_tuple (tuple): arguments for the query
+        fetch_amount (FetchAmount): how many rows to return
+        error_msg (str): what to display on error
+
+    Returns:
+        sqlite3.Row | None: a row or list of rows, or None
+    """
     try:
         with (connection := get_db_connection()):
             result = connection.execute(query, args_tuple)
@@ -48,8 +61,8 @@ def execute_query(query, args_tuple, fetch_amount, error_msg):
                 return result.fetchone()
             if fetch_amount == FetchAmount.ALL:
                 return result.fetchall()
-            if fetch_amount == FetchAmount.ZERO:
-                return None
+
+            return None
     except sqlite3.Error as exception:
         print(
             f"[ERROR] {error_msg}\n"
@@ -105,12 +118,13 @@ def get_user_by_username_or_email(username_or_email):
     """
     return execute_query(
         "SELECT * FROM users WHERE username = ? or email = ?",
-        (username_or_email,username_or_email),
+        (username_or_email, username_or_email),
         FetchAmount.ONE,
         f"Failed to fetch user with username or email {username_or_email}",
     )
 
-def create_user(username, email, password, is_admin = False):
+
+def create_user(username, email, password, is_admin=False):
     """Adds a user to the database
 
     Args:
@@ -120,14 +134,13 @@ def create_user(username, email, password, is_admin = False):
         is_admin (bool, optional): Whether the user should be an admin. Defaults to False.
     """
     password_hash = bcrypt.hashpw(bytes(password, "utf-8"), bcrypt.gensalt())
-    is_admin = 1 if is_admin else 0 # bools in sqlite are ints
+    is_admin = 1 if is_admin else 0  # bools in sqlite are ints
     execute_query(
         "INSERT INTO users (username, email, password_hash, is_admin) VALUES (?,?,?,?)",
         (username, email, password_hash, is_admin),
         FetchAmount.ZERO,
         "Failed to add new user",
     )
-
 
 
 def get_all_users():
@@ -159,9 +172,13 @@ def check_password(username_or_email: str, password: str):
     password_hash = user["password_hash"]
     if not password_hash:
         return None
-    if not isinstance(password_hash, bytes): # something went very wrong
-        raise Exception(f"Hash {password_hash} is {type(password_hash)} but should be of type bytes")
-    return bcrypt.checkpw(bytes(password,"utf8"), password_hash)
+    if not isinstance(password_hash, bytes):  # something went very wrong
+        raise Exception(
+            f"Hash {password_hash} is {type(password_hash)}"
+            " but should be of type bytes"
+        )
+    return bcrypt.checkpw(bytes(password, "utf8"), password_hash)
+
 
 def reset_database():
     """
@@ -171,7 +188,7 @@ def reset_database():
     try:
         connection = get_db_connection()
 
-        with open('mylib/schema.sql', encoding="utf-8") as sql_file:
+        with open("mylib/schema.sql", encoding="utf-8") as sql_file:
             connection.executescript(sql_file.read())
 
         # add admin user
@@ -187,7 +204,6 @@ def reset_database():
         print("Successfully set up database")
 
 
-
 def create_post(title: str, content: str, creator: int):
     """Insert a new post into the database
 
@@ -197,10 +213,13 @@ def create_post(title: str, content: str, creator: int):
         content (str): the text of the post
         creator (int): user's id
     """
-    execute_query("INSERT INTO posts (title, content, creator) VALUES (?,?,?)",
+    execute_query(
+        "INSERT INTO posts (title, content, creator) VALUES (?,?,?)",
         (title, content, creator),
         FetchAmount.ZERO,
-        "Failed to create post")
+        "Failed to create post",
+    )
+
 
 def update_post(post_id: int, title: str, content: str):
     """Edits an existing post in the database
@@ -210,26 +229,31 @@ def update_post(post_id: int, title: str, content: str):
         title (str): the title of the post
         content (str): the text of the post
     """
-    execute_query("UPDATE posts SET title = ?, content = ? WHERE id = ?",
+    execute_query(
+        "UPDATE posts SET title = ?, content = ? WHERE id = ?",
         (title, content, post_id),
         FetchAmount.ZERO,
-        "Failed to update post")
+        "Failed to update post",
+    )
 
 
 def get_all_posts():
-    """Gets all posts from database
-    """
-    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id "
-    "ORDER BY created DESC",
+    """Gets all posts from database"""
+    return execute_query(
+        "SELECT * FROM posts JOIN users ON posts.creator = users.id "
+        "ORDER BY created DESC",
         tuple(),
         FetchAmount.ALL,
-        "Failed to fetch all posts")
+        "Failed to fetch all posts",
+    )
 
 
 def get_post(post_id):
-    """Gets a post by id
-    """
-    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id WHERE posts.id = ?",
+    """Gets a post by id"""
+    return execute_query(
+        "SELECT * FROM posts JOIN users ON posts.creator = users.id"
+        " WHERE posts.id = ?",
         (post_id,),
         FetchAmount.ONE,
-        "Failed to fetch post by id")
+        "Failed to fetch post by id",
+    )
