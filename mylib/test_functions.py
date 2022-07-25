@@ -74,4 +74,4 @@ def test_get_nonexistent_user(_with_added_users):
 
 def test_add_posts(_with_added_users):
     """Tests the ability to add posts"""
-    db_functions.create_post("Hello, world!", 2)
+    db_functions.create_post("My post","Hello, world!", 2)

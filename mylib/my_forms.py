@@ -5,6 +5,7 @@ The WTForms for the application
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, EmailField, ValidationError
 from wtforms.validators import Length, Email, EqualTo, InputRequired
+from wtforms.widgets import TextArea
 from . import db_functions
 
 
@@ -52,3 +53,9 @@ class LoginForm(FlaskForm):
     username_or_email = StringField("Username or email", [Length(min=3, max=25), InputRequired()])
     password = PasswordField("Password", [Length(min=3, max=50), InputRequired(), validate_password])
 
+
+class EditForm(FlaskForm):
+    """A form for editing a post"""
+    title = StringField("Title", [InputRequired()])
+    content = StringField("Content", [InputRequired()], widget=TextArea())
+    

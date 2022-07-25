@@ -1,0 +1,17 @@
+{% from "_formfield.j2" import render_field %}
+{% extends "base.j2" %}
+{% block content %}
+<form method="POST">
+    <fieldset>
+        <legend>Log in</legend>
+        {{ form.hidden_tag() }}
+
+        <dl>
+        {{ render_field(form.title) }}
+        {{ render_field(form.content) }}
+        </dl>
+
+        <input type="submit" value="Submit" />
+    </fieldset>
+</form>
+{% endblock %}

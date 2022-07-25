@@ -140,24 +140,20 @@ def get_all_users():
         "SELECT * FROM users", tuple(), FetchAmount.ALL, "Failed to fetch all users"
     )
 
-def create_post(content: str, creator: str):
+def create_post(title: str, content: str, creator: int):
     """Insert a new post into the database
 
 
     Args:
+        title (str): the title of the post
         content (str): the text of the post
-        creator (str): user's id
+        creator (int): user's id
     """
-    execute_query("INSERT INTO posts (content, creator) VALUES (?,?)",
-        (content, creator),
+    execute_query("INSERT INTO posts (title, content, creator) VALUES (?,?,?)",
+        (title, content, creator),
         FetchAmount.ZERO,
         "Failed to create post")
 
-def get_all_posts():
-    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id",
-        tuple(),
-        FetchAmount.ALL,
-        "Failed to fetch all posts")
 
 def check_password(username_or_email: str, password: str):
     """Checks to see if a username/email and password combination is correct
@@ -204,3 +200,25 @@ def reset_database():
     else:
         print("Successfully set up database")
 
+
+
+
+
+
+
+def get_all_posts():
+    """Gets all posts from database
+    """
+    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id",
+        tuple(),
+        FetchAmount.ALL,
+        "Failed to fetch all posts")
+
+
+def get_post(post_id):
+    """Gets a post by id
+    """
+    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id WHERE posts.id = ?",
+        (post_id,),
+        FetchAmount.ONE,
+        "Failed to fetch post by id")

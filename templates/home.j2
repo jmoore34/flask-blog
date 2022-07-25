@@ -10,11 +10,11 @@
 {% endif %}
 
 {% for post in posts %}
-    <div style="padding: 1em; border: 1px solid black;">
+    <div style="padding: 1em; border: 1px solid black; margin: 1em;">
         <p><b>{{ post.username }}</b></p>
-        <p><i>{{ post.created }}</i></p>
+        <p><i>Created on {{ post.created }}</i></p>
         <hr>
         <p>{{ post.content }}</p>
-    <div>
+    </div>
 {% endfor %}
 {% endblock %}

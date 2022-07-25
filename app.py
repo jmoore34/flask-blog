@@ -35,6 +35,24 @@ def about() -> Response:
     """
     return render_template("about.j2")
 
+@app.route("/edit", methods=["GET","POST"])
+@app.route("/edit/<int:post_id>", methods=["GET","POST"])
+def edit(post_id = None):
+    if not session.get("user") or not session["user"]["id"]:
+        return redirect(url_for("home"))
+
+    form = my_forms.EditForm()
+    if form.validate_on_submit():
+        if post_id is None:
+            db_functions.create_post(
+                title = form.title.data,
+                content = form.content.data,
+                creator = session["user"]["id"]
+            )
+            return redirect(url_for("home"))
+
+    return render_template("edit.j2", form=form)
+
 @app.route("/admin")
 def admin():
     """The admin page which shows the list of users.
