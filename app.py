@@ -56,8 +56,8 @@ def edit(post_id=None):
     if post_id is not None:
         existing = db_functions.get_post(post_id)
 
-    if existing["creator"] != session["user"]["id"] and not session["user"]["is_admin"]:
-        return redirect(url_for("home"))
+        if existing["creator"] != session["user"]["id"] and not session["user"]["is_admin"]:
+            return redirect(url_for("home"))
 
     form = my_forms.EditForm()
     if form.validate_on_submit():
