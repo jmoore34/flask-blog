@@ -26,6 +26,15 @@ def home(message = None) -> Response:
     return render_template("home.j2", message=message)
 
 
+@app.route("/about")
+def about() -> Response:
+    """Renders the about page
+
+    Returns:
+        Response: the rendered about page HTML
+    """
+    return render_template("about.j2")
+
 @app.route("/admin")
 def admin():
     """The admin page which shows the list of users.
@@ -95,5 +104,7 @@ def logout():
     """
     session.pop("user")
     return redirect(url_for("home", message="Logged out successfully."))
+
+
 
 app.run()
