@@ -237,6 +237,19 @@ def update_post(post_id: int, title: str, content: str):
     )
 
 
+def delete_post(post_id: int):
+    """Deletes an existing post in the database
+
+    Args:
+        post_id (int): the id of the post
+    """
+    execute_query(
+        "DELETE FROM posts WHERE id = ?",
+        (post_id,),
+        FetchAmount.ZERO,
+        "Failed to delete post",
+    )
+
 def get_all_posts():
     """Gets all posts from database"""
     return execute_query(

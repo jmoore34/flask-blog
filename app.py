@@ -56,7 +56,11 @@ def edit(post_id=None):
     if post_id is not None:
         existing = db_functions.get_post(post_id)
 
-        if existing["creator"] != session["user"]["id"] and not session["user"]["is_admin"]:
+        if (  # if the post exists and the user doesn't own it (and isn't admin)
+            existing is not None
+            and existing["creator"] != session["user"]["id"]
+            and not session["user"]["is_admin"]
+        ):
             return redirect(url_for("home"))
 
     form = my_forms.EditForm()
@@ -79,6 +83,32 @@ def edit(post_id=None):
         form.title.data = existing["title"]
         form.content.data = existing["content"]
     return render_template("edit.j2", form=form)
+
+
+@app.route("/delete/<int:post_id>")
+def delete(post_id: int):
+    """Deletes a post by its id (if the user is authorized to delete it)
+
+    Args:
+        post_id (int): the post's id
+
+    Returns:
+        Response: a redirect to the homepage
+    """
+    if not session.get("user") or not session["user"]["id"]:
+        return redirect(url_for("home"))
+
+    existing = db_functions.get_post(post_id)
+
+    # can't delete a post if it doesn't exist or user isn't authorized
+    if existing is None or (
+        existing["creator"] != session["user"]["id"]
+        and not session["user"]["is_admin"]
+    ):
+        return redirect(url_for("home"))
+
+    db_functions.delete_post(post_id)
+    return redirect(url_for("home"))
 
 
 @app.route("/admin")
