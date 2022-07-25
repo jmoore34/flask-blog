@@ -9,5 +9,12 @@
 <br>
 {% endif %}
 
-    Home
+{% for post in posts %}
+    <div style="padding: 1em; border: 1px solid black;">
+        <p><b>{{ post.username }}</b></p>
+        <p><i>{{ post.created }}</i></p>
+        <hr>
+        <p>{{ post.content }}</p>
+    <div>
+{% endfor %}
 {% endblock %}

@@ -153,6 +153,12 @@ def create_post(content: str, creator: str):
         FetchAmount.ZERO,
         "Failed to create post")
 
+def get_all_posts():
+    return execute_query("SELECT * FROM posts JOIN users ON posts.creator = users.id",
+        tuple(),
+        FetchAmount.ALL,
+        "Failed to fetch all posts")
+
 def check_password(username_or_email: str, password: str):
     """Checks to see if a username/email and password combination is correct
 

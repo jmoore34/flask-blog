@@ -23,7 +23,7 @@ def home(message = None) -> Response:
     Returns:
         Response: the rendered homepage HTML
     """
-    return render_template("home.j2", message=message)
+    return render_template("home.j2", message=message, posts=db_functions.get_all_posts())
 
 
 @app.route("/about")
