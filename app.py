@@ -41,16 +41,33 @@ def edit(post_id = None):
     if not session.get("user") or not session["user"]["id"]:
         return redirect(url_for("home"))
 
+    existing = None
+    if post_id is not None:
+        existing = db_functions.get_post(post_id)
+
+    if existing["creator"] != session["user"]["id"] and not session["user"]["is_admin"]:
+        return redirect(url_for("home"))
+
     form = my_forms.EditForm()
     if form.validate_on_submit():
-        if post_id is None:
+        if existing is None: # brand new post
             db_functions.create_post(
                 title = form.title.data,
                 content = form.content.data,
                 creator = session["user"]["id"]
             )
             return redirect(url_for("home"))
+        else: # update existing
+            db_functions.update_post(
+                post_id = post_id,
+                title = form.title.data,
+                content = form.content.data
+            )
+            return redirect(url_for("home"))
 
+    if existing is not None:
+        form.title.data = existing["title"]
+        form.content.data = existing["content"]
     return render_template("edit.j2", form=form)
 
 @app.route("/admin")
