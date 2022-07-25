@@ -70,3 +70,8 @@ def test_get_nonexistent_user(_with_added_users):
     assert db_functions.get_user_by_username("nonexistent_user") is None
     assert db_functions.get_user_by_email("nonexistent_user") is None
     assert db_functions.get_user_by_username_or_email("nonexistent_user") is None
+
+
+def test_add_posts(_with_added_users):
+    """Tests the ability to add posts"""
+    db_functions.create_post("Hello, world!", 2)

@@ -33,43 +33,6 @@ def get_db_connection():
 
 
 
-def get_messages():
-    """Fetches all the messages from the database
-
-    Returns:
-        List: a list of dictionaries with `username` and `content` keys
-    """
-    try:
-        with (connection := get_db_connection()):
-            return connection.execute("SELECT * FROM messages ORDER BY created DESC")
-
-    except sqlite3.Error as exception:
-        print(f"Error while getting all messages: {exception}")
-        sys.exit()
-
-
-def add_message(username, content):
-    """Inserts a message into the database
-
-    Args:
-        username (str): the poster's username
-        content (str): the message's text content
-    """
-    try:
-        with (connection := get_db_connection()):
-            connection.execute(
-                "INSERT INTO messages (username, content) VALUES (?,?)",
-                (username, content),
-            )
-            connection.commit()
-
-    except sqlite3.Error as exception:
-        print(
-            f"Error while adding message with username {username!r} "
-            f"and content {content!r}: {exception}"
-        )
-
-
 class FetchAmount(Enum):
     ZERO = 0
     ONE = 1
@@ -177,6 +140,18 @@ def get_all_users():
         "SELECT * FROM users", tuple(), FetchAmount.ALL, "Failed to fetch all users"
     )
 
+def create_post(content: str, creator: str):
+    """Insert a new post into the database
+
+
+    Args:
+        content (str): the text of the post
+        creator (str): user's id
+    """
+    execute_query("INSERT INTO posts (content, creator) VALUES (?,?)",
+        (content, creator),
+        FetchAmount.ZERO,
+        "Failed to create post")
 
 def check_password(username_or_email: str, password: str):
     """Checks to see if a username/email and password combination is correct
@@ -213,7 +188,7 @@ def reset_database():
 
         # add admin user
         create_user("admin", "admin@site.com", "admin", is_admin=True)
-        # add some demo users
+        # add some demo posts
         connection.commit()
 
     except sqlite3.Error as exception:
@@ -222,3 +197,4 @@ def reset_database():
             connection.close()
     else:
         print("Successfully set up database")
+

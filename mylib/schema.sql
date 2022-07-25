@@ -16,3 +16,13 @@ CREATE TABLE users (
     password_hash CHAR(60) NOT NULL,
     is_admin BOOLEAN NOT NULL CHECK (is_admin IN (0,1)) DEFAULT 0
 );
+
+PRAGMA foreign_keys = ON;
+
+DROP TABLE IF EXISTS posts;
+CREATE TABLE posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL,
+    creator INTEGER NOT NULL,
+    FOREIGN KEY(creator) REFERENCES users(id)
+);
