@@ -1,0 +1,16 @@
+{% from "_formfield.j2" import render_field %}
+<form method="POST">
+    <fieldset>
+        <legend>Register</legend>
+        {{ form.hidden_tag() }}
+
+        <dl>
+        {{ render_field(form.username) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.confirm_password) }}
+        </dl>
+
+        <input type="submit" value="Submit" />
+    </fieldset>
+</form>
