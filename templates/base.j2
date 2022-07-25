@@ -10,6 +10,16 @@
     </span>
 </p>
 <br><br><br>
-<div style="display:block;">
-{% block content %}{% endblock %}
+<div style="display: flex; flex-direction: row;">
+    <div style="display:block; width: 75vw;">
+    {% block content %}{% endblock %}
+    </div>
+    <div style="width: 20vw; margin-left: 3vw;">
+        <h1>Our Sidebar</h1>
+        <ul>
+            <li><a href="/home">Latest posts</a></li>
+            <li><a href="#">Announcements</a></li>
+            <li><a href="#">Calendars</a></li>
+        </ul>
+    </div>
 </div>
