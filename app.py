@@ -109,7 +109,9 @@ def register():
             email=form.email.data,
             password=form.password.data,
         )
-        session["username"] = request.form["username"]
+        session["user"] = dict(
+            db_functions.get_user_by_username_or_email(form.username_or_email.data)
+        )  # convert the row to a User dict
         return redirect(
             url_for(
                 "home",
