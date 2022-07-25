@@ -32,26 +32,6 @@ def get_db_connection():
         return None
 
 
-def reset_database():
-    """
-    Deletes and re-creates all the database tables
-    """
-    connection = None
-    try:
-        connection = get_db_connection()
-
-        with open('mylib/schema.sql', encoding="utf-8") as sql_file:
-            connection.executescript(sql_file.read())
-
-        connection.commit()
-
-    except sqlite3.Error as exception:
-        print(f"Error while setting up database: {exception}")
-        if connection is not None:
-            connection.close()
-    else:
-        print("Successfully set up database")
-
 
 def get_messages():
     """Fetches all the messages from the database
@@ -219,3 +199,26 @@ def check_password(username_or_email: str, password: str):
     if not isinstance(password_hash, bytes): # something went very wrong
         raise Exception(f"Hash {password_hash} is {type(password_hash)} but should be of type bytes")
     return bcrypt.checkpw(bytes(password,"utf8"), password_hash)
+
+def reset_database():
+    """
+    Deletes and re-creates all the database tables
+    """
+    connection = None
+    try:
+        connection = get_db_connection()
+
+        with open('mylib/schema.sql', encoding="utf-8") as sql_file:
+            connection.executescript(sql_file.read())
+
+        # add admin user
+        create_user("admin", "admin@site.com", "admin", is_admin=True)
+        # add some demo users
+        connection.commit()
+
+    except sqlite3.Error as exception:
+        print(f"Error while setting up database: {exception}")
+        if connection is not None:
+            connection.close()
+    else:
+        print("Successfully set up database")

@@ -1,5 +1,20 @@
 {% extends "base.j2" %}
 
 {% block content %}
-Admin
+<p>Admin View</p>
+
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Rank</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ "Administrator" if user.is_admin else "-" }}
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

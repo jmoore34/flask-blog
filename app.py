@@ -34,7 +34,7 @@ def admin():
         Response: content of the admin page (i.e. the list of users)
     """
     if session.get("user") and session["user"]["is_admin"]:
-        return render_template("admin.j2")
+        return render_template("admin.j2", users=db_functions.get_all_users())
     # if not admin, send back to homepage
     return redirect(url_for("home"))
 

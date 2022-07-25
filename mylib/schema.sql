@@ -16,7 +16,3 @@ CREATE TABLE users (
     password_hash CHAR(60) NOT NULL,
     is_admin BOOLEAN NOT NULL CHECK (is_admin IN (0,1)) DEFAULT 0
 );
-
--- Insert admin user
-INSERT INTO users (username, email, password_hash, is_admin) VALUES
-("admin", "admin@smoothstack.com", "$2b$12$ZeboAFxNgixhWn5PztL2CuUwXMgf.UcupLwipqpJWruQwlcyRNlty", 1);
