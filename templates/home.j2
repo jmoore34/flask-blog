@@ -13,6 +13,9 @@
     <div style="padding: 1em; border: 1px solid black; margin: 1em;">
         <p><b>{{ post.username }}</b></p>
         <p><i>Created on {{ post.created }}</i></p>
+        {% if session.get("user") and (session["user"]["id"] == post["creator"] or session["user"]["is_admin"]) %}
+            <p><a href="/edit/{{ post.id }}">Edit</a></p>
+        {% endif %}
         <hr>
         <h1>{{ post.title }}</h1>
         <p>{{ post.content }}</p>
