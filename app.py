@@ -3,9 +3,9 @@ A small flask application.
 Run `flask run` in the directory to start.
 """
 
+import os
 from flask import Flask, redirect, render_template, session, request, url_for, Response
 from mylib import db_functions, my_forms
-
 
 app = Flask(__name__)
 app.secret_key = "1ccbfc0a11ac4264b771d230fb952b95"
@@ -188,5 +188,9 @@ def logout():
     session.pop("user")
     return redirect(url_for("home", message="Logged out successfully."))
 
-
-app.run()
+if __name__ == "__main__":
+    if os.environ.get("FLASK_ENV") == "production":
+        from waitress import serve
+        serve(app, host="0.0.0.0", port=80)
+    else: # development
+        app.run()
